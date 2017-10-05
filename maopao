@@ -1,0 +1,194 @@
+module paixu(clk,rst_n,politics,result_txd,flag_o);
+  input clk,rst_n;
+  input[8:0]politics[0:5];
+  output[8:0]result_txd;
+  output flag_o;
+  reg[8:0]result_temp[0:5];
+  reg[8:0]result_txd;
+  reg[8:0]politics_temp[0:5];
+  reg[3:0]count_1,count_2,count_3;
+  reg count_1_en;
+  reg  flag_o;
+  always@(posedge clk or negedge rst_n)begin
+    if(~rst_n)
+      count_1<=4'b0;
+    else if(count_1_en)begin
+      count_1<=count_1+4'b1;
+      count_1_en<=1'b0;
+    end
+    else if(count_1==4)
+      count_1<=4'b0;
+  end
+  
+  always@(posedge clk or negedge rst_n)begin
+    if(~rst_n)
+      count_2<=4'b0;
+    else if(~count_1_en)
+      count_2<=count_2+4'b1;
+  end
+
+  always@(posedge clk or negedge rst_n)begin
+    if(~rst_n)begin
+        count_1_en<=1'b0; 
+        politics_temp<=politics;
+        flag_o<=1'b0;
+        result_txd<=9'b0;
+    end   
+    else if(count_1==4'd0)begin
+      case(count_2)
+        4'd0:begin
+              if(politics_temp[0]>politics_temp[1])begin
+                politics_temp[1]<=politics_temp[0];
+                politics_temp[0]<=politics_temp[1];
+              end
+             end     
+        4'd1:begin
+              if(politics_temp[1]>politics_temp[2])begin
+                politics_temp[2]<=politics_temp[1];
+                politics_temp[1]<=politics_temp[2];
+              end
+             end     
+        4'd2:begin
+              if(politics_temp[2]>politics_temp[3])begin
+                politics_temp[2]<=politics_temp[3];
+                politics_temp[3]<=politics_temp[2];
+              end
+             end     
+        4'd3:begin
+              if(politics_temp[3]>politics_temp[4])begin
+                politics_temp[3]<=politics_temp[4];
+                politics_temp[4]<=politics_temp[3];
+              end
+             end     
+        4'd4:begin
+              if(politics_temp[4]>politics_temp[5])begin
+                politics_temp[4]<=politics_temp[5];
+                politics_temp[5]<=politics_temp[4];
+              end
+              count_1_en<=1'b1;
+              count_2<=4'b0;
+             end  
+      endcase
+    end
+     else if(count_1==4'd1)begin
+       //count_1_en<=1'b0;
+       case(count_2)
+         4'd0:begin
+              
+              if(politics_temp[0]>politics_temp[1])begin
+                politics_temp[1]<=politics_temp[0];
+                politics_temp[0]<=politics_temp[1];
+              end
+             end     
+        4'd1:begin
+              if(politics_temp[1]>politics_temp[2])begin
+                politics_temp[2]<=politics_temp[1];
+                politics_temp[1]<=politics_temp[2];
+              end
+             end     
+        4'd2:begin
+              if(politics_temp[2]>politics_temp[3])begin
+                politics_temp[2]<=politics_temp[3];
+                politics_temp[3]<=politics_temp[2];
+              end
+             end     
+        4'd3:begin
+              if(politics_temp[3]>politics_temp[4])begin
+                politics_temp[3]<=politics_temp[4];
+                politics_temp[4]<=politics_temp[3];
+              end
+              count_1_en<=1'b1;
+              count_2<=4'b0;
+             end 
+      endcase
+    end
+    else if(count_1==4'd2)begin
+      //count_1_en<=1'b0;
+       case(count_2)
+         4'd0:begin
+              
+              if(politics_temp[0]>politics_temp[1])begin
+                politics_temp[1]<=politics_temp[0];
+                politics_temp[0]<=politics_temp[1];
+              end
+             end     
+        4'd1:begin
+              if(politics_temp[1]>politics_temp[2])begin
+                politics_temp[2]<=politics_temp[1];
+                politics_temp[1]<=politics_temp[2];
+              end
+             end     
+        4'd2:begin
+              if(politics_temp[2]>politics_temp[3])begin
+                politics_temp[2]<=politics_temp[3];
+                politics_temp[3]<=politics_temp[2];
+              end
+              count_1_en<=1'b1;
+              count_2<=4'b0;
+             end 
+       endcase
+    end
+    else if(count_1==4'd3)begin
+      //count_1_en<=1'b0;
+       case(count_2)
+         4'd0:begin
+              
+              if(politics_temp[0]>politics_temp[1])begin
+                politics_temp[1]<=politics_temp[0];
+                politics_temp[0]<=politics_temp[1];
+              end
+             end     
+        4'd1:begin
+              if(politics_temp[1]>politics_temp[2])begin
+                politics_temp[2]<=politics_temp[1];
+                politics_temp[1]<=politics_temp[2];
+              end
+              count_1_en<=1'b1;
+              count_2<=4'b0;
+             end
+       endcase     
+    end
+     else if(count_1==4'd4)begin
+       //count_1_en<=1'b0;
+       case(count_2)
+         4'd0:begin
+              
+              if(politics_temp[0]>politics_temp[1])begin
+                politics_temp[1]<=politics_temp[0];
+                politics_temp[0]<=politics_temp[1];
+              end
+              count_1_en<=1'b1;
+              count_2<=4'b0;
+              flag_o<=1'b1;
+             end
+        endcase
+        result_temp<=politics_temp;
+       end
+      end
+      
+      always@(posedge clk or negedge rst_n)begin
+        if(~rst_n)
+          count_3<=4'b0;
+        else if(flag_o)begin
+          if(count_3<6)
+           count_3<=count_3+4'b1;
+          else begin
+            count_3<=4'b0;
+            flag_o<=1'b0;
+          end
+        end
+       end
+       always@(count_3)begin
+         case(count_3)
+           4'd0:result_txd=9'b0;
+           4'd1:result_txd=result_temp[5];
+           4'd2:result_txd=result_temp[4];
+           4'd3:result_txd=result_temp[3];
+           4'd4:result_txd=result_temp[2];
+           4'd5:result_txd=result_temp[1];
+           4'd6:result_txd=result_temp[0];
+           default:$display("error");
+         endcase
+       end   
+endmodule
+
